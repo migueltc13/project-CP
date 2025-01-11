@@ -119,10 +119,10 @@
 
 %====== DEFINIR GRUPO E ELEMENTOS =============================================%
 
-\group{G99}
-\studentA{a95485}{Miguel Torres Carvalho}
-\studentB{a96587}{Flávia Alexandra da Silva Araújo}
-\studentC{a104001}{Frederico Cunha Afonso}
+\group{7}
+\studentA{95485}{Miguel Torres Carvalho}
+\studentB{96587}{Flávia Alexandra da Silva Araújo}
+\studentC{104001}{Frederico Cunha Afonso}
 
 %==============================================================================%
 

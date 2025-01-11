@@ -1,0 +1,10 @@
+# Ignore latex build files
+cp2425t.aux
+cp2425t.bbl
+cp2425t.bib
+cp2425t.blg
+cp2425t.idx
+cp2425t.log
+cp2425t.out
+cp2425t.ptb
+cp2425t.sty

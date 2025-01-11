@@ -553,14 +553,6 @@ teste = evaluate (let_exp f i) == Just (26 % 245)
 %----------------- Soluções dos alunos -----------------------------------------%
 
 \section{Soluções dos alunos}\label{sec:resolucao}
-Os alunos devem colocar neste anexo as suas soluções para os exercícios
-propostos, de acordo com o ``layout'' que se fornece.
-Não podem ser alterados os nomes ou tipos das funções dadas, mas pode ser
-adicionado texto ao anexo, bem como diagramas e/ou outras funções auxiliares
-que sejam necessárias.
-
-\noindent
-\textbf{Importante}: Não pode ser alterado o texto deste ficheiro fora deste anexo.
 
 \subsection*{Problema 1}
 

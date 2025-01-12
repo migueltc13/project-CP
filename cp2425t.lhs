@@ -161,8 +161,10 @@ e elegantes que utilizem os combinadores de ordem superior estudados na discipli
 
 %if False
 \begin{code}
-{-# OPTIONS_GHC -XNPlusKPatterns #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving, DeriveDataTypeable, FlexibleInstances #-}
+{-# LANGUAGE NPlusKPatterns, FlexibleInstances #-}
+{-# OPTIONS_GHC -Wno-noncanonical-monad-instances #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use camelCase" #-}
 module Main where
 import Cp
 import List hiding (fac)
@@ -556,9 +558,72 @@ teste = evaluate (let_exp f i) == Just (26 % 245)
 
 \subsection*{Problema 1}
 
+\begin{quote}\em
+O \textit{h-index} de um histograma é o maior número |n| de barras do histograma cuja
+altura é maior ou igual a |n|.
+\end{quote}
+
+Para a resolução deste problema, recorreu-se a uma estratégia de divisão e conquista
+com recurso a um hylomorfismo de listas, definido na biblioteca \List,
+com o anamorfismo responsável por ordenar a lista de \textit{input} de forma crescente
+e o catamorfismo que, iterativamente, seleciona os elementos, incrementando o valor de \textit{h-index},
+em que |n| corresponde aos |n| elementos maiores ou iguais a |n|, sendo esta condição
+um invariante ao longo das iterações do catamorfismo. Graças à forma recursiva do catamorfismo,
+dada pelo functor do catamorfismo |conquer|, é possível iterar sobre a lista de forma
+decrescente, garantindo que o valor de \textit{h-index} é o maior possível.
+
+A estrutura de dados intermédia deste hylomorfismo é uma lista de inteiros,
+do tipo |[Int]|, esta correspondendo à saída do anamorfismo |divide| e à
+respetiva entrada do catamorfismo |conquer|.
+
+\includegraphics[width=.9\textwidth]{cp2425t_media/hindex-hylo.png}
+
 \begin{code}
-hindex = undefined
+hindex = hyloList conquer divide
+  where
+    conquer = either g1 g2
+    g1 = const (0, [])
+    g2 (h, t@(i, x))
+      | h > i     = (i+1, h:x)
+      | otherwise = t
+
+    divide [] = i1 ()
+    divide xs = let m = minimum xs
+                in i2 (m, delete m xs)
 \end{code}
+
+\clearpage
+
+Para além da solução apresentada, foi também desenvolvida uma solução alternativa
+que recorre somente a um catamorfismo de listas, modificado de forma a que a função
+|out| seja capaz, aquando a lista de entrada não é vazia, de dividir a lista em
+duas partes, uma com o valor mínimo e outra com o restante da lista. Deste modo,
+a funcionalidade do anamorfismo |divide| é incorporada na função |out|.
+
+A seguinte solução alternativa é 100\% \textit{pointfree}, com a função |g2| do gene
+do catamorfismo redesenhada, assim como a função |out|, esta, como supramencionado,
+equivalente à função |divide| da solução principal.
+
+\includegraphics[width=.8\textwidth]{cp2425t_media/hindex-cata.png}
+
+\begin{code}
+hindex' :: [Int] -> (Int, [Int])
+hindex' = cata conquer
+  where
+    conquer = either g1 g2
+    g1 = const (0, [])
+    g2 = cond (uncurry (>) . (id >< p1))
+              (split (succ . p1 . p2) (cons . (id >< p2)))
+              p2
+
+outSortList = cond ([] ==)
+                   (i1 . (!))
+                   (i2 . split p1 (uncurry delete) . split minimum id)
+
+cata g = g . recList (cata g) . outSortList
+\end{code}
+
+\clearpage
 
 \subsection*{Problema 2}
 Primeira parte:
@@ -570,12 +635,16 @@ Segunda parte:
 prime_tree = undefined
 \end{code}
 
+\clearpage
+
 \subsection*{Problema 3}
 
 \begin{code}
 convolve :: Num a => [a] -> [a] -> [a]
 convolve = undefined
 \end{code}
+
+\clearpage
 
 \subsection*{Problema 4}
 Definição do tipo:
@@ -589,7 +658,7 @@ recExpr = undefined
 cataExpr g = undefined
 
 anaExpr g = undefined
-                
+
 hyloExpr h g = undefined
 \end{code}
 \emph{Maps}:

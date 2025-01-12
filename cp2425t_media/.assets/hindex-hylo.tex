@@ -1,0 +1,10 @@
+\[
+\xymatrix{
+    \ar@/_4.75pc/[dd]_{hindex}
+    Int^* \ar@/^1pc/[rr]^{divide} \ar[d]_{\la divide \ra} & & 1 + Int \times Int^* \ar[d]^{id + id \times \la divide \ra}
+    \\
+    Int^* \ar@/^1pc/[rr]^{out_\text{List}} \ar@{}[rr]|-{\hspace{.75cm}\cong} \ar[d]_{\lb conquer \rb} & & 1 + Int \times Int^* \ar@/^1pc/[ll]^{in_\text{List}} \ar[d]^{id + id \times \lb conquer \rb}
+    \\
+    Int \times Int^* & & 1 + Int \times (Int \times Int^*) \ar@/^1pc/[ll]^{conquer}
+}
+\]

@@ -564,7 +564,7 @@ altura é maior ou igual a |n|.
 \end{quote}
 
 Para a resolução deste problema, recorreu-se a uma estratégia de divisão e conquista
-com recurso a um hylomorfismo de listas, definido na biblioteca \List,
+com recurso a um hilomorfismo de listas, definido na biblioteca \List,
 com o anamorfismo responsável por ordenar a lista de \textit{input} de forma crescente
 e o catamorfismo que, iterativamente, seleciona os elementos, incrementando o valor de \textit{h-index},
 em que |n| corresponde aos |n| elementos maiores ou iguais a |n|, sendo esta condição
@@ -572,7 +572,7 @@ um invariante ao longo das iterações do catamorfismo. Graças à forma recursi
 dada pelo functor do catamorfismo |conquer|, é possível iterar sobre a lista de forma
 decrescente, garantindo que o valor de \textit{h-index} é o maior possível.
 
-A estrutura de dados intermédia deste hylomorfismo é uma lista de inteiros,
+A estrutura de dados intermédia deste hilomorfismo é uma lista de inteiros,
 do tipo |[Int]|, esta correspondendo à saída do anamorfismo |divide| e à
 respetiva entrada do catamorfismo |conquer|.
 

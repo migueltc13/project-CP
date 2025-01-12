@@ -628,13 +628,45 @@ cata g = g . recList (cata g) . outSortList
 \clearpage
 
 \subsection*{Problema 2}
+
 Primeira parte:
+
+TODO estrategia anamorfismo
+
+\includegraphics[width=.6\textwidth]{cp2425t_media/primes.png}
+
 \begin{code}
-primes = undefined
+primes = anaList g
+  where
+    g n
+      | n < 2     = i1 ()
+      | otherwise = let p = head [x | x <- [2..n], n `mod` x == 0]
+                    in i2 (p, n `div` p)
 \end{code}
+
+\clearpage
+
 Segunda parte:
+
+TODO estrategia pelos 2 passos
+
+\includegraphics[width=.65\textwidth]{cp2425t_media/prime_tree.png}
+
 \begin{code}
-prime_tree = undefined
+prime_tree = mergeTrees . map (toExpTree . split primes id)
+
+toExpTree ([], x) = Var x
+toExpTree (x:xs, y) = Term x [toExpTree (xs, y)]
+
+mergeTrees [tree] = tree
+mergeTrees trees = Term 1 (mergeSubtrees trees)
+
+mergeSubtrees [] = []
+mergeSubtrees [tree] = [tree]
+mergeSubtrees (Term o xs : Term o' ys : trees)
+  | o == o'   = mergeSubtrees (Term o (xs ++ ys) : trees)
+  | otherwise = Term o xs : mergeSubtrees (Term o' ys : trees)
+mergeSubtrees (tree:trees) = tree : mergeSubtrees trees
 \end{code}
 
 \clearpage

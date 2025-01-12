@@ -926,15 +926,14 @@ Avaliação de expressões:
 \textbf{TODO} Texto explicativo
 
 \begin{code}
-evaluate = mcataExpr eval
+evaluate = mcataExpr (either (const Nothing) (either Just evalTerm))
   where
-  eval = either (const Nothing) (either Just evalTerm)
-  evalTerm op = case op of
-    (Add, Just [x,y]) -> Just (x + y)
-    (Mul, Just [x,y]) -> Just (x * y)
-    (Suc, Just [x]) -> Just (x + 1)
-    (ITE, Just [x,y,z]) -> if x /= 0 then Just y else Just z
-    _ -> Nothing
+    evalTerm op = case op of
+      (Add, Just [x,y]) -> Just (x + y)
+      (Mul, Just [x,y]) -> Just (x * y)
+      (Suc, Just [x]) -> Just (x + 1)
+      (ITE, Just [x,y,z]) -> if x /= 0 then Just y else Just z
+      _ -> Nothing
 \end{code}
 
 %----------------- Índice remissivo (exige makeindex) -------------------------%

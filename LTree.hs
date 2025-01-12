@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-noncanonical-monad-instances #-}
 
 -- (c) MP-I (1998/9-2006/7) and CP (2005/6-2024/25)
 

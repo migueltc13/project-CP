@@ -879,6 +879,10 @@ let_exp' = muExpr .: fmap  -- equivalent to: let\_exp f = muExpr . fmap f
   where (.:) = (.) . (.)
 \end{code}
 
+\includegraphics[width=.9\textwidth]{cp2425t_media/let_exp-cata.png}
+
+\clearpage
+
 A outra versão é equivalente à principal, como demonstrado seguidamente,
 sendo esta uma versão \textit{pointfree}, que recorre às funções |muExpr| e |fmap|.
 
@@ -905,8 +909,6 @@ sendo esta uma versão \textit{pointfree}, que recorre às funções |muExpr| e 
 |
 \qed
 \end{eqnarray*}
-
-\clearpage
 
 \noindent
 Catamorfismo monádico:

@@ -1,0 +1,17 @@
+\[
+\xymatrix{
+    A^* \times A^* \ar[d]_{swapper}
+    \\
+    A^* \times A^* \ar[d]_{inFormat}
+    \\
+    \ar@/_4.75pc/[dd]_{\lh conquer, divide \rh}
+    B \ar@/^1pc/[rr]^{divide} \ar[d]_{\la divide \ra} & & 1 + B \times B \ar[d]^{id + id \times \la divide \ra}
+    \\
+    B^* \ar@/^1pc/[rr]^{out_{List}} \ar@{}[rr]|-{\hspace{.75cm}\cong} \ar[d]_{\lb conquer \rb} & & 1 + B \times B^* \ar@/^1pc/[ll]^{in_{List}} \ar[d]^{id + id \times \lb conquer \rb}
+    \\
+    A^* & & 1 + B \times A^* \ar@/^1pc/[ll]^{conquer}
+}
+
+\hspace*{3cm}
+\text{where} B = (A^* \times A^*) \times (A^* \times Int)
+\]

@@ -667,7 +667,7 @@ Para a geração da árvore de primos de um conjunto de inteiros, optou-se por u
 estratégia composta por dois passos principais:
 
 \begin{enumerate}
-    \item Geração de uma de árvore de expressões após a obteção da lista de
+    \item Geração de uma de árvore de expressões após a obtenção da lista de
         fatores primos para cada número do conjunto de entrada,
         recorrendo às funções |toExpTree| e |split primes id|, respetivamente.
     \item Construção da árvore de primos, com recurso à função |mergeTrees|, que
@@ -724,19 +724,30 @@ convolve = cataList conquer .: curry divide
     f = sum . uncurry (zipWith (*))
 \end{code}
 
+\clearpage
+
+\includegraphics[width=.8\textwidth]{cp2425t_media/convolve-hylo.png}
+
+\vspace{1cm}
+
+\hspace{3cm}
+\includegraphics[width=.55\textwidth]{cp2425t_media/convolve-all-alt.png}
+
+\vspace{0.5cm}
+
 \begin{code}
-convolve' = curry (uncurry drop . split diffTamanho (hyloList conquer divide . inFormat . checkGreater))
+convolve' = curry (uncurry drop . split sizeDiff (hyloList conquer divide . inFormat . swapper))
   where
-    diffTamanho = abs . uncurry (-) . (length >< length)
-    checkGreater = cond (uncurry (>) . (length >< length)) id swap
+    sizeDiff = abs . uncurry (-) . (length >< length)
+    swapper  = cond (uncurry (>) . (length >< length)) id swap
     inFormat = split id (swap . split (flip (-) 1 . (2*) . length . p1) p2)
 
     conquer = either nil (cons . (applyMaths >< id))
       where applyMaths = sum . uncurry (zipWith (*)) . swap . p1
 
-    divide = cond ((0 ==) . p2 . p2) (i1 . (!)) (i2 . dup . split (split (p1 . p1) listaTorna) ((id >< flip (-) 1) . p2))
+    divide = cond ((0 ==) . p2 . p2) (i1 . (!)) (i2 . dup . split (split (p1 . p1) makeList) ((id >< flip (-) 1) . p2))
       where
-        listaTorna = buildPair . split p2 (length . p1 . p1)
+        makeList = buildPair . split p2 (length . p1 . p1)
         buildPair = uncurry drop . split (p2 . p1) (uncurry (++) . split (flip replicate 0 . p2) (reverse . p1 . p1))
 \end{code}
 

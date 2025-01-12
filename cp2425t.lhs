@@ -166,7 +166,7 @@ e elegantes que utilizem os combinadores de ordem superior estudados na discipli
 {-# LANGUAGE NPlusKPatterns, FlexibleInstances #-}
 {-# OPTIONS_GHC -Wno-noncanonical-monad-instances #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Use camelCase" #-}
+{-# HLINT ignore "Use camelCase", "Use isNothing" #-}
 module Main where
 import Cp
 import List hiding (fac)
@@ -810,11 +810,11 @@ concluindo-se a seguinte definição de |outExpr|:
 |
     outExpr . [V, [N, uncurry T]] = id
 |
-\just\equiv{ 20: Fusão-+ (2x) }
+\just\equiv{ 20: Fusão-|+| (2x) }
 |
     [outExpr . V, [outExpr . N, outExpr . uncurry T]] = id
 |
-\just\equiv{ 17: Universal-+ (2x), 1: Natural-id (2x) }
+\just\equiv{ 17: Universal-|+| (2x), 1: Natural-id (2x) }
 |
     lcbr3(
         outExpr . V = i1
@@ -909,25 +909,58 @@ instance Applicative (Expr b) where
 \emph{Let expressions}:
 
 Foram desenvolvidas duas versões da função |let_exp|, uma com recurso ao catamorfismo
-|cataExpr| com um gene similar a |inExpr| com exceção da aplicação da função |f|
-para as variáveis.
-
-A outra versão é equivalente à principal, sendo esta uma versão \textit{pointfree},
-que recorre às funções |muExpr| e |fmap|.
+|cataExpr| com um gene similar a |inExpr| com exceção do uso da função |f| para
+as variáveis de |Expr|.
 
 \begin{code}
 let_exp f = cataExpr (either f (either N (uncurry T)))
 
-let_exp' = muExpr .: fmap  -- equivalent to: (muExpr .) . fmap
+let_exp' = muExpr .: fmap  -- equivalent to: let\_exp f = muExpr . fmap f
   where (.:) = (.) . (.)
 \end{code}
 
-\textbf{TODO} provar |let_exp == let_exp'|
+\includegraphics[width=.9\textwidth]{cp2425t_media/let_exp-cata.png}
+
+\clearpage
+
+A outra versão é equivalente à principal, como demonstrado seguidamente,
+sendo esta uma versão \textit{pointfree}, que recorre às funções |muExpr| e |fmap|.
+
+\begin{eqnarray*}
+\start
+|
+    let_exp f = muExpr . fmap f
+|
+\just\equiv{ Def. muExpr, fmap f = T f }
+|
+    let_exp f = cata (either id (either N (uncurry T))) . T f
+|
+\just\equiv{ 52: Absorção-cata }
+|
+    let_exp f = cata (either id (either N (uncurry T)) . B(f, id))
+|
+\just\equiv{ |B(f, id) = baseExpr f id id = f + (id + id >< map id)| }
+|
+    let_exp f = cata (either id (either N (uncurry T)) . (f + (id + id >< map id)))
+|
+\just\equiv{ |map id = id|, 22: Absorção-|+|, 1: Natural-id, 15: Functor-id-|><| }
+|
+    let_exp f = cata (either f (either N (uncurry T)))
+|
+\qed
+\end{eqnarray*}
 
 \noindent
 Catamorfismo monádico:
 
-\textbf{TODO} Texto explicativo
+O catamorfismo monádico é uma extensão do conceito clássico de catamorfismo,
+integrando efeitos monádicos no processo de redução de uma estrutura.
+No contexto do tipo |Expr|, ele permite combinar a manipulação de subestruturas
+com operações que podem falhar ou envolver efeitos computacionais.
+
+A definição do |mcataExpr| recorre a função |traverseExpr| para percorrer a
+estrutura exterior de forma monádica e recursiva, após a travessia, aplica a
+função |phi| ao resultado, que encapsula a lógica final de transformação.
 
 \begin{code}
 mcataExpr phi t = do { b <- traverseExpr (mcataExpr phi) (outExpr t); phi b }
@@ -939,19 +972,101 @@ traverseExpr f = either (return . i1) (either (return . i2 . i1) m)
 \noindent
 Avaliação de expressões:
 
-\textbf{TODO} Texto explicativo
+A função |evaluate| utiliza o catamorfismo monádico para calcular o valor de uma
+expressão, considerando:
+
+\begin{enumerate}
+    \item \textbf{Variáveis} --- não avaliadas, retornam |Nothing|.
+    \item \textbf{Aridades} --- |Just| com o valor.
+    \item \textbf{Termos compostos} --- avaliados de acordo com operadores pré-definidos.
+\end{enumerate}
+
+Os operadores suportados incluem:
+
+\begin{itemize}
+    \item |Add| --- adição de dois valores,
+    \item |Mul| --- multiplicação de dois valores,
+    \item |Suc| --- sucessor de um valor, equivalente a |+ 1|,
+    \item |ITE| --- \textit{if-then-else}, controlado por um valor condicional.
+\end{itemize}
+
+Cada operador é aplicado a uma lista de operandos previamente avaliados.
+Se os operandos não forem válidos (exemplo: número insuficiente de argumentos),
+a avaliação falha com |Nothing|.
+
+Esta definição segue um estilo declarativo, aproveitando o poder combinatório
+de \textit{monads} para simplificar a lógica de processamento,
+abstraindo os detalhes da manipulação estrutural.
 
 \begin{code}
-evaluate = mcataExpr eval
+evaluate = mcataExpr (either (const Nothing) (either Just evalTerm))
   where
-  eval = either (const Nothing) (either Just evalTerm)
-  evalTerm op = case op of
-    (Add, Just [x,y]) -> Just (x + y)
-    (Mul, Just [x,y]) -> Just (x * y)
-    (Suc, Just [x]) -> Just (x + 1)
-    (ITE, Just [x,y,z]) -> if x /= 0 then Just y else Just z
-    _ -> Nothing
+    evalTerm op = case op of
+      (Add, Just [x,y])   -> Just (x + y)
+      (Mul, Just [x,y])   -> Just (x * y)
+      (Suc, Just [x])     -> Just (x + 1)
+      (ITE, Just [x,y,z]) -> if x /= 0 then Just y else Just z
+      _ -> Nothing
 \end{code}
+
+%----------------------------------- Tests ------------------------------------%
+
+%if False
+\begin{code}
+_and = cataList (either (const True) (uncurry (&&)))
+
+-- Tests for Problem 1
+test1_1 = (p1 . hindex) h == 5
+
+test1_2 = (p1 . hindex) [1..10] == 5
+
+test1_3 = (p1 . hindex) [1..100] == 50
+
+test1_4 = hindex [] == (0, [])
+
+test1 = _and [test1_1, test1_2, test1_3, test1_4]
+
+-- Tests for Problem 2
+test2_1_1 = primes 455 == [5,7,13]
+test2_1_2 = primes 433 == [433]
+test2_1_3 = primes 230 == [2,5,23]
+
+test2_2_1 = prime_tree [455, 669, 6645, 34, 12, 2] == Term 1 [Term 5 [Term 7 [Term 13 [Var 455]]],Term 3 [Term 223 [Var 669],Term 5 [Term 443 [Var 6645]]],Term 2 [Term 17 [Var 34],Term 2 [Term 3 [Var 12]],Var 2]]
+test2_2_2 = prime_tree [3,5,7,10]                  == Term 1 [Term 3 [Var 3],Term 5 [Var 5],Term 7 [Var 7],Term 2 [Term 5 [Var 10]]]
+test2_2_3 = prime_tree []                          == Term 1 []
+
+test2_1 = _and [test2_1_1, test2_1_2, test2_1_3]
+test2_2 = _and [test2_2_1, test2_2_2, test2_2_3]
+test2 = test2_1 && test2_2
+
+-- Tests for Problem 3
+test3_1 = convolve [1, 2,3]  [4,5,6] == [4,13,28,27,18]
+test3_2 = convolve [2, 1]    [3,4,5] == [6,11,14,5]
+test3_3 = convolve [1]       [7,8,9] == [7,8,9]
+test3_4 = convolve [1,-1,2]  [0,3]   == [0,3,-3,6]
+
+test3 = _and [test3_1, test3_2, test3_3, test3_4]
+
+-- Tests for Problem 4
+test4_1 = evaluate (let_exp f i) == Just (26 / 245)
+  where f "x" = N 0; f "y" = N (1 / 7)
+
+test4_2 = evaluate (let_exp f e) == Just 40
+  where f "x" = N 0; f "y" = N 5; f _ = N 99
+
+test4_3 = evaluate (T ITE [N 0, N 0, T Mul [N 5, T Add [N 3, N 1]]]) == Just 20
+
+test4_4 = evaluate (let_exp f i) == Nothing
+  where f "x" = N 0; f _ = V "w"
+
+test4_5 = evaluate (T ITE [N 1, N 1]) == Nothing
+
+test4 = _and [test4_1, test4_2, test4_3, test4_4, test4_5]
+
+-- Test all
+test = _and [test1, test2, test3, test4]
+\end{code}
+%endif
 
 %----------------- Índice remissivo (exige makeindex) -------------------------%
 

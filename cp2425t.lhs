@@ -114,6 +114,8 @@
 %format (ana' (f) (g)) = "\lanabracket\;\!" f "\:" g "\:\!\ranabracket"
 %format (hylo' (ft) (ff) (gt) (gf)) = "\llbracket\, " ft "\:" ff ",\," gt "\:" gf "\,\rrbracket"
 %format .* = "\star " 
+%format (hyloList (g) (h)) = "\llbracket\, " g ",\," h "\,\rrbracket"
+
 %------------------------------------------------------------------------------%
 
 

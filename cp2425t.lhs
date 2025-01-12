@@ -629,9 +629,23 @@ cata g = g . recList (cata g) . outSortList
 
 \subsection*{Problema 2}
 
-Primeira parte:
+% Primeira parte
 
-TODO estrategia anamorfismo
+Para a descoberta dos fatores primos de um número, não negativo,
+foi implementado um anamorfismo de listas, |primes|, que, para um dado número,
+devolve a sua lista única de fatores primos.
+
+Este anamorfismo é definido por um gene que, para um número |n|, verifica se
+este é menor que 2, caso em que devolve um valor à esquerda do tipo |1 + Int >< Int|
+que indica o fim da iteração, ou, caso contrário, devolve um valor à direita do tipo
+|1 + Int >< Int| cujo a primeira componente do par é o menor fator primo de |n|
+e a segunda componente é o quociente da divisão de |n| pelo seu menor fator primo,
+para que a iteração continue.
+
+Para obtenção do menor fator primo de um número |n|, recorre-se a uma lista de inteiros
+por compreensão, |x <- [2..n]|, que, para cada |x|, verifica se |n `mod` x == 0|, ou seja,
+se |x| é um fator de |n|. Caso seja, |x| é o menor fator primo de |n| e
+devolve-se o par |(x, n `div` x)|.
 
 \includegraphics[width=.6\textwidth]{cp2425t_media/primes.png}
 
@@ -646,9 +660,18 @@ primes = anaList g
 
 \clearpage
 
-Segunda parte:
+% Segunda parte
 
-TODO estrategia pelos 2 passos
+Para a geração da árvore de primos de um conjunto de inteiros, optou-se por uma
+estratégia composta por dois passos principais:
+
+\begin{enumerate}
+    \item Geração de uma de árvore de expressões após a obteção da lista de
+        fatores primos para cada número do conjunto de entrada,
+        recorrendo às funções |toExpTree| e |split primes id|, respetivamente.
+    \item Construção da árvore de primos, com recurso à função |mergeTrees|, que
+        recebe uma lista de árvores de expressões e as funde numa única árvore.
+\end{enumerate}
 
 \includegraphics[width=.65\textwidth]{cp2425t_media/prime_tree.png}
 

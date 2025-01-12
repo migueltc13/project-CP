@@ -707,9 +707,9 @@ Após verificar qual de ambas listas recebidas é a menor, esta irá criar uma l
 |N + M - 1| tuplos (onde |N| e |M| representam o tamanho da maior e menor lista recebida). 
 Os tuplos vão ser constituídos pela maior lista recebida original à esquerda, e por uma 
 versão alterada da menor lista recebida à direita (sendo cada versão criada única ao tuplo 
-a que pertence)
+a que pertence).
 
-Finalmente, com auxílio de um Catamorfismo, a lista será iterada, aplicando a cada tuplo
+Finalmente, com auxílio de um catamorfismo de listas, a lista será iterada, aplicando a cada tuplo
 uma função que multiplique todos os membros de ambas listas com um mesmo índice, e, mais tarde,
 faça o somatório da lista resultante, adicionando o resultado obtido a uma lista final.
 
@@ -748,9 +748,24 @@ convolve = cataList conquer .: curry divide
     g2 = cons . (f >< id)
     f = sum . uncurry (zipWith (*))
 \end{code}
+
 \clearpage
+Como alternativa, foi desenvolvida uma versão desta função que é completamente \textit{pointfree} e aproveita a 
+inferência de tipos do Haskell. 
+
+Aqui, a função |convolve'|, ao invés de usar somente um catamorfismo de listas, baseia-se num hylomorfismo, 
+este também de listas.
+
+A função a ser usada pelo anamorfismo de listas vai recursivamente desenvolver o tuplo recebido, 
+guardando neste um tuplo com a maior lista recebida e uma versão alterada da menor, e num segundo tuplo, 
+a menor lista (original) e o número da iteração efetuada.
+
+Por outro lado, função a ser usada pelo catamorfismo de listas será aquela que foi usada no fim da versão 
+anterior de |convolve|, aplicando as anteriormente mencionadas multiplicações seguidas de um somatório da 
+lista resultante a todos os tuplos ali presentes. 
+
 \begin{center}
-\includegraphics[width=0.7\textwidth]{cp2425t_media/convolve-hylo.png}
+\includegraphics[width=0.65\textwidth]{cp2425t_media/convolve-hylo.png}
 
 \vspace{1cm}
 

@@ -669,18 +669,18 @@ estratégia composta por dois passos principais:
 \begin{enumerate}
     \item Geração de uma de árvore de expressões após a obtenção da lista de
         fatores primos para cada número do conjunto de entrada,
-        recorrendo às funções |toExpTree| e |split primes id|, respetivamente.
+        recorrendo ao anamorfismo de \Exp |ana g| e a função |split primes id|, respetivamente.
     \item Construção da árvore de primos, com recurso à função |mergeTrees|, que
         recebe uma lista de árvores de expressões e as funde numa única árvore.
 \end{enumerate}
 
-\includegraphics[width=.65\textwidth]{cp2425t_media/prime_tree.png}
+\includegraphics[width=.6\textwidth]{cp2425t_media/prime_tree.png}
 
 \begin{code}
-prime_tree = mergeTrees . map (toExpTree . split primes id)
-
-toExpTree ([], x) = Var x
-toExpTree (x:xs, y) = Term x [toExpTree (xs, y)]
+prime_tree = mergeTrees . map (anaExp g . split primes id)
+  where
+    g ([], x) = i1 x
+    g (x:xs, y) = i2 (x, [(xs, y)])
 
 mergeTrees [tree] = tree
 mergeTrees trees = Term 1 (mergeSubtrees trees)

@@ -697,16 +697,16 @@ mergeSubtrees (tree:trees) = tree : mergeSubtrees trees
 
 \subsection*{Problema 3}
 A convolução é uma operação muito utilizada em áreas como processamento de sinais, redes neurais
-e outras relacionadas à computação. Assim, consistindo em, partindo de duas listas |a| e |b|, 
-combinar a informação de ambas as listas, através de multiplicações e somas, resultando na criação 
+e outras relacionadas à computação. Assim, consistindo em, partindo de duas listas |a| e |b|,
+combinar a informação de ambas as listas, através de multiplicações e somas, resultando na criação
 de uma nova lista.
 
 De maneira a alcançar uma função que tivesse este comportamento, definimos a |convolve|.
 
-Após verificar qual de ambas listas recebidas é a menor, esta irá criar uma lista de 
-|N + M - 1| tuplos (onde |N| e |M| representam o tamanho da maior e menor lista recebida). 
-Os tuplos vão ser constituídos pela maior lista recebida original à esquerda, e por uma 
-versão alterada da menor lista recebida à direita (sendo cada versão criada única ao tuplo 
+Após verificar qual de ambas listas recebidas é a menor, esta irá criar uma lista de
+|N + M - 1| tuplos (onde |N| e |M| representam o tamanho da maior e menor lista recebida).
+Os tuplos vão ser constituídos pela maior lista recebida original à esquerda, e por uma
+versão alterada da menor lista recebida à direita (sendo cada versão criada única ao tuplo
 a que pertence).
 
 Finalmente, com auxílio de um catamorfismo de listas, a lista será iterada, aplicando a cada tuplo
@@ -750,19 +750,19 @@ convolve = cataList conquer .: curry divide
 \end{code}
 
 \clearpage
-Como alternativa, foi desenvolvida uma versão desta função que é completamente \textit{pointfree} e aproveita a 
-inferência de tipos do Haskell. 
+Como alternativa, foi desenvolvida uma versão desta função que é completamente \textit{pointfree} e aproveita a
+inferência de tipos do Haskell.
 
-A função |convolve'|, ao invés de usar somente um catamorfismo de listas, baseia-se num hylomorfismo, 
+A função |convolve'|, ao invés de usar somente um catamorfismo de listas, baseia-se num hylomorfismo,
 este também de listas.
 
-O gene do anamorfismo vai recursivamente desenvolver o tuplo recebido, guardando neste um tuplo com a maior 
-lista recebida e uma versão alterada da menor, e num segundo tuplo, a menor lista (original) e o número da 
+O gene do anamorfismo vai recursivamente desenvolver o tuplo recebido, guardando neste um tuplo com a maior
+lista recebida e uma versão alterada da menor, e num segundo tuplo, a menor lista (original) e o número da
 iteração efetuada.
 
-Por outro lado, o gene do catamorfismo será aquele usado na versão anterior de |convolve|, aplicando as 
-anteriormente mencionadas multiplicações seguidas de um somatório da lista resultante a todos os tuplos ali 
-presentes. 
+Por outro lado, o gene do catamorfismo será aquele usado na versão anterior de |convolve|, aplicando as
+anteriormente mencionadas multiplicações seguidas de um somatório da lista resultante a todos os tuplos ali
+presentes.
 
 \begin{center}
 \includegraphics[width=0.65\textwidth]{cp2425t_media/convolve-hylo.png}

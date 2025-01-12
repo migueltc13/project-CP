@@ -753,16 +753,16 @@ convolve = cataList conquer .: curry divide
 Como alternativa, foi desenvolvida uma versão desta função que é completamente \textit{pointfree} e aproveita a 
 inferência de tipos do Haskell. 
 
-Aqui, a função |convolve'|, ao invés de usar somente um catamorfismo de listas, baseia-se num hylomorfismo, 
+A função |convolve'|, ao invés de usar somente um catamorfismo de listas, baseia-se num hylomorfismo, 
 este também de listas.
 
-A função a ser usada pelo anamorfismo de listas vai recursivamente desenvolver o tuplo recebido, 
-guardando neste um tuplo com a maior lista recebida e uma versão alterada da menor, e num segundo tuplo, 
-a menor lista (original) e o número da iteração efetuada.
+O gene do anamorfismo vai recursivamente desenvolver o tuplo recebido, guardando neste um tuplo com a maior 
+lista recebida e uma versão alterada da menor, e num segundo tuplo, a menor lista (original) e o número da 
+iteração efetuada.
 
-Por outro lado, função a ser usada pelo catamorfismo de listas será aquela que foi usada no fim da versão 
-anterior de |convolve|, aplicando as anteriormente mencionadas multiplicações seguidas de um somatório da 
-lista resultante a todos os tuplos ali presentes. 
+Por outro lado, o gene do catamorfismo será aquele usado na versão anterior de |convolve|, aplicando as 
+anteriormente mencionadas multiplicações seguidas de um somatório da lista resultante a todos os tuplos ali 
+presentes. 
 
 \begin{center}
 \includegraphics[width=0.65\textwidth]{cp2425t_media/convolve-hylo.png}

@@ -770,11 +770,11 @@ concluindo-se a seguinte definição de |outExpr|:
 |
     outExpr . [V, [N, uncurry T]] = id
 |
-\just\equiv{ 20: Fusão-+ (2x) }
+\just\equiv{ 20: Fusão-|+| (2x) }
 |
     [outExpr . V, [outExpr . N, outExpr . uncurry T]] = id
 |
-\just\equiv{ 17: Universal-+ (2x), 1: Natural-id (2x) }
+\just\equiv{ 17: Universal-|+| (2x), 1: Natural-id (2x) }
 |
     lcbr3(
         outExpr . V = i1
@@ -869,20 +869,44 @@ instance Applicative (Expr b) where
 \emph{Let expressions}:
 
 Foram desenvolvidas duas versões da função |let_exp|, uma com recurso ao catamorfismo
-|cataExpr| com um gene similar a |inExpr| com exceção da aplicação da função |f|
-para as variáveis.
-
-A outra versão é equivalente à principal, sendo esta uma versão \textit{pointfree},
-que recorre às funções |muExpr| e |fmap|.
+|cataExpr| com um gene similar a |inExpr| com exceção do uso da função |f| para
+as variáveis de |Expr|.
 
 \begin{code}
 let_exp f = cataExpr (either f (either N (uncurry T)))
 
-let_exp' = muExpr .: fmap  -- equivalent to: (muExpr .) . fmap
+let_exp' = muExpr .: fmap  -- equivalent to: let\_exp f = muExpr . fmap f
   where (.:) = (.) . (.)
 \end{code}
 
-\textbf{TODO} provar |let_exp == let_exp'|
+A outra versão é equivalente à principal, como demonstrado seguidamente,
+sendo esta uma versão \textit{pointfree}, que recorre às funções |muExpr| e |fmap|.
+
+\begin{eqnarray*}
+\start
+|
+    let_exp f = muExpr . fmap f
+|
+\just\equiv{ Def. muExpr, fmap f = T f }
+|
+    let_exp f = cata (either id (either N (uncurry T))) . T f
+|
+\just\equiv{ 52: Absorção-cata }
+|
+    let_exp f = cata (either id (either N (uncurry T)) . B(f, id))
+|
+\just\equiv{ |B(f, id) = baseExpr f id id = f + (id + id >< map id)| }
+|
+    let_exp f = cata (either id (either N (uncurry T)) . (f + (id + id >< map id)))
+|
+\just\equiv{ |map id = id|, 22: Absorção-|+|, 1: Natural-id, 15: Functor-id-|><| }
+|
+    let_exp f = cata (either f (either N (uncurry T)))
+|
+\qed
+\end{eqnarray*}
+
+\clearpage
 
 \noindent
 Catamorfismo monádico:

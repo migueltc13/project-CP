@@ -40,6 +40,7 @@
 %format <$> = "\mathbin{\mathopen{\langle}\$\mathclose{\rangle}}"
 %format Either a b = a "+" b
 %format fmap = "\mathsf{fmap}"
+%format bmap = "\mathsf{bmap}"
 %format NA   = "\textsc{na}"
 %format NB   = "\textbf{NB}"
 %format inT = "\mathsf{in}"
@@ -538,6 +539,7 @@ h :: [Int]
 \end{code}
 
 \subsection*{Problema 4}
+
 Definição do tipo:
 \begin{code}
 inExpr = either V (either N (uncurry T))
@@ -639,7 +641,7 @@ devolve a sua lista única de fatores primos.
 Este anamorfismo é definido por um gene que, para um número |n|, verifica se
 este é menor que 2, caso em que devolve um valor à esquerda do tipo |1 + Int >< Int|
 que indica o fim da iteração, ou, caso contrário, devolve um valor à direita do tipo
-|1 + Int >< Int| cujo a primeira componente do par é o menor fator primo de |n|
+|1 + Int >< Int| cuja primeira componente do par é o menor fator primo de |n|
 e a segunda componente é o quociente da divisão de |n| pelo seu menor fator primo,
 para que a iteração continue.
 
@@ -696,15 +698,16 @@ mergeSubtrees (tree:trees) = tree : mergeSubtrees trees
 \clearpage
 
 \subsection*{Problema 3}
+
 A convolução é uma operação muito utilizada em áreas como processamento de sinais, redes neurais
-e outras relacionadas à computação. Assim, consistindo em, partindo de duas listas |a| e |b|,
-combinar a informação de ambas as listas, através de multiplicações e somas, resultando na criação
+e outras relacionadas à computação. Assim, partindo de duas listas |a| e |b|,
+combina-se a informação de ambas as listas, através de multiplicações e somas, resultando na criação
 de uma nova lista.
 
 De maneira a alcançar uma função que tivesse este comportamento, definimos a |convolve|.
 
-Após verificar qual de ambas listas recebidas é a menor, esta irá criar uma lista de
-|N + M - 1| tuplos (onde |N| e |M| representam o tamanho da maior e menor lista recebida).
+Após verificar qual de ambas as listas recebidas é a menor, esta irá criar uma lista de
+|N + M - 1| tuplos (onde |N| e |M| representam os tamanhos das listas).
 Os tuplos vão ser constituídos pela maior lista recebida original à esquerda, e por uma
 versão alterada da menor lista recebida à direita (sendo cada versão criada única ao tuplo
 a que pertence).
@@ -713,16 +716,9 @@ Finalmente, com auxílio de um catamorfismo de listas, a lista será iterada, ap
 uma função que multiplique todos os membros de ambas listas com um mesmo índice, e, mais tarde,
 faça o somatório da lista resultante, adicionando o resultado obtido a uma lista final.
 
-
-
-
 \begin{center}
 \includegraphics[width=.6\textwidth]{cp2425t_media/convolve-cata.png}
 \end{center}
-
-
-
-
 
 \begin{code}
 convolve :: Num a => [a] -> [a] -> [a]
@@ -750,10 +746,11 @@ convolve = cataList conquer .: curry divide
 \end{code}
 
 \clearpage
+
 Como alternativa, foi desenvolvida uma versão desta função que é completamente \textit{pointfree} e aproveita a
 inferência de tipos do Haskell.
 
-A função |convolve'|, ao invés de usar somente um catamorfismo de listas, baseia-se num hylomorfismo,
+A função |convolve'|, ao invés de usar somente um catamorfismo de listas, baseia-se num hilomorfismo,
 este também de listas.
 
 O gene do anamorfismo vai recursivamente desenvolver o tuplo recebido, guardando neste um tuplo com a maior
@@ -877,9 +874,8 @@ hyloExpr h g = cataExpr h . anaExpr g
 \noindent
 \emph{Maps}:
 
-Para o tipo |Expr b| também foram desenvolvidas as instâncias de |Functor| e
-|BiFunctor|, com as definições de |fmap| e |bmap| respetivamente, estas derivadas
-da lei \textit{Def-map-cata} (51).
+Foram desenvolvidas as instâncias de |Functor| e |BiFunctor| para o tipo |Expr|,
+com |fmap| e |bmap| derivadas da lei \textit{Def-map-cata} (51).
 
 \begin{code}
 instance Functor (Expr b) where

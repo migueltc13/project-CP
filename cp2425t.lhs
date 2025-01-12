@@ -648,7 +648,7 @@ por compreensão, |x <- [2..n]|, que, para cada |x|, verifica se |n `mod` x == 0
 se |x| é um fator de |n|. Caso seja, |x| é o menor fator primo de |n| e
 devolve-se o par |(x, n `div` x)|.
 
-\includegraphics[width=.6\textwidth]{cp2425t_media/primes.png}
+\includegraphics[width=.6\textwidth]{cp2425t_media/primes-ana.png}
 
 \begin{code}
 primes = anaList g
@@ -837,15 +837,14 @@ hyloExpr h g = cataExpr h . anaExpr g
 \noindent
 \emph{Maps}:
 
-TODO texto fmap (T f = ...)?
-
-TODO texto bmap
+Para o tipo |Expr b| também foram desenvolvidas as instâncias de |Functor| e
+|BiFunctor|, com as definições de |fmap| e |bmap| respetivamente, estas derivadas
+da lei \textit{Def-map-cata} (51).
 
 \begin{code}
 instance Functor (Expr b) where
     fmap g = cataExpr (inExpr . baseExpr g id id)
 
--- TODO Dúvida bmap está certo?
 instance BiFunctor Expr where
     bmap h g = cataExpr (inExpr . baseExpr g h id)
 \end{code}
@@ -854,8 +853,6 @@ instance BiFunctor Expr where
 \emph{Monad}:
 
 \begin{code}
--- TODO verificar de acordo com os exercícios da ficha 12
-
 instance Monad (Expr b) where
     return  = V
     t >>= g = (muExpr . fmap g) t
@@ -871,19 +868,26 @@ instance Applicative (Expr b) where
 \noindent
 \emph{Let expressions}:
 
-TODO falar da versão pointwise
+Foram desenvolvidas duas versões da função |let_exp|, uma com recurso ao catamorfismo
+|cataExpr| com um gene similar a |inExpr| com exceção da aplicação da função |f|
+para as variáveis.
 
-TODO falar da versão pointfree que é equivalente:
+A outra versão é equivalente à principal, sendo esta uma versão \textit{pointfree},
+que recorre às funções |muExpr| e |fmap|.
 
 \begin{code}
 let_exp f = cataExpr (either f (either N (uncurry T)))
 
-let_exp' = muExpr .: fmap  -- equivalent: (muExpr .) . fmap
+let_exp' = muExpr .: fmap  -- equivalent to: (muExpr .) . fmap
   where (.:) = (.) . (.)
 \end{code}
 
+\textbf{TODO} provar |let_exp == let_exp'|
+
 \noindent
 Catamorfismo monádico:
+
+\textbf{TODO} Texto explicativo
 
 \begin{code}
 mcataExpr phi t = do { b <- traverseExpr (mcataExpr phi) (outExpr t); phi b }
@@ -895,18 +899,18 @@ traverseExpr f = either (return . i1) (either (return . i2 . i1) m)
 \noindent
 Avaliação de expressões:
 
+\textbf{TODO} Texto explicativo
+
 \begin{code}
-evaluate = mcataExpr singleEval
+evaluate = mcataExpr eval
   where
-    singleEval :: (Num a, Ord a) => Either b (Either a (Op, Maybe [a])) -> Maybe a
-    singleEval (Left _) = Nothing
-    singleEval (Right (Left n)) = Just n
-    singleEval (Right (Right (Add, Just [x, y]))) = Just (x + y)
-    singleEval (Right (Right (Mul, Just [x, y]))) = Just (x * y)
-    singleEval (Right (Right (Suc, Just [x]))) = Just (x + 1)
-    singleEval (Right (Right (ITE, Just [x, y, z]))) =
-        if x /= 0 then Just y else Just z
-    singleEval _ = Nothing
+  eval = either (const Nothing) (either Just evalTerm)
+  evalTerm op = case op of
+    (Add, Just [x,y]) -> Just (x + y)
+    (Mul, Just [x,y]) -> Just (x * y)
+    (Suc, Just [x]) -> Just (x + 1)
+    (ITE, Just [x,y,z]) -> if x /= 0 then Just y else Just z
+    _ -> Nothing
 \end{code}
 
 %----------------- Índice remissivo (exige makeindex) -------------------------%

@@ -696,8 +696,33 @@ mergeSubtrees (tree:trees) = tree : mergeSubtrees trees
 \clearpage
 
 \subsection*{Problema 3}
+A convolução é uma operação muito utilizada em áreas como processamento de sinais, redes neurais
+e outras relacionadas à computação. Assim, consistindo em, partindo de duas listas |a| e |b|, 
+combinar a informação de ambas as listas, através de multiplicações e somas, resultando na criação 
+de uma nova lista.
 
-\includegraphics[width=.7\textwidth]{cp2425t_media/convolve-cata.png}
+De maneira a alcançar uma função que tivesse este comportamento, definimos a |convolve|.
+
+Após verificar qual de ambas listas recebidas é a menor, esta irá criar uma lista de 
+|N + M - 1| tuplos (onde |N| e |M| representam o tamanho da maior e menor lista recebida). 
+Os tuplos vão ser constituídos pela maior lista recebida original à esquerda, e por uma 
+versão alterada da menor lista recebida à direita (sendo cada versão criada única ao tuplo 
+a que pertence)
+
+Finalmente, com auxílio de um Catamorfismo, a lista será iterada, aplicando a cada tuplo
+uma função que multiplique todos os membros de ambas listas com um mesmo índice, e, mais tarde,
+faça o somatório da lista resultante, adicionando o resultado obtido a uma lista final.
+
+
+
+
+\begin{center}
+\includegraphics[width=.6\textwidth]{cp2425t_media/convolve-cata.png}
+\end{center}
+
+
+
+
 
 \begin{code}
 convolve :: Num a => [a] -> [a] -> [a]
@@ -723,15 +748,15 @@ convolve = cataList conquer .: curry divide
     g2 = cons . (f >< id)
     f = sum . uncurry (zipWith (*))
 \end{code}
-
 \clearpage
-
-\includegraphics[width=.8\textwidth]{cp2425t_media/convolve-hylo.png}
+\begin{center}
+\includegraphics[width=0.7\textwidth]{cp2425t_media/convolve-hylo.png}
 
 \vspace{1cm}
 
 \hspace{3cm}
-\includegraphics[width=.55\textwidth]{cp2425t_media/convolve-all-alt.png}
+\includegraphics[width=0.45\textwidth]{cp2425t_media/convolve-all-alt.png}
+\end{center}
 
 \vspace{0.5cm}
 

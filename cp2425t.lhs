@@ -183,6 +183,7 @@ import System.Process
 import Data.Char
 import Data.Ratio
 import Control.Concurrent
+import Data.Time (UniversalTime)
 
 main = undefined
 \end{code}
@@ -743,33 +744,159 @@ convolve' = curry (uncurry drop . split diffTamanho (hyloList conquer divide . i
 \clearpage
 
 \subsection*{Problema 4}
+
 Definição do tipo:
+
+Para o cálculo de |outExpr|, partiu-se do isomorfismo
+de |outExpr| e |inExpr| e da definição de |inExpr|,
+concluindo-se a seguinte definição de |outExpr|:
+
+\begin{eqnarray*}
+\start
+|
+	outExpr . inExpr = id
+|
+\just\equiv{ Def. inExpr }
+|
+    outExpr . [V, [N, uncurry T]] = id
+|
+\just\equiv{ 20: Fusão-+ (2x) }
+|
+    [outExpr . V, [outExpr . N, outExpr . uncurry T]] = id
+|
+\just\equiv{ 17: Universal-+ (2x), 1: Natural-id (2x) }
+|
+    lcbr3(
+        outExpr . V = i1
+    )(
+        outExpr . N = i2 . i1
+    )(
+        outExpr . uncurry T = i2 . i2
+    )
+|
+\just\equiv{ 72: Igualdade Extencional, 73: Def-comp, 86: Uncurry }
+|
+    lcbr3(
+        outExpr (V v) = i1 v
+    )(
+        outExpr (N n) = (i2 . i1) n
+    )(
+        outExpr (T o exprs) = (i2 . i2) (o, exprs)
+    )
+|
+\qed
+\end{eqnarray*}
+
 \begin{code}
-outExpr = undefined
-
-recExpr = undefined
+outExpr (V v)       = i1 v
+outExpr (N n)       = (i2 . i1) n
+outExpr (T o exprs) = (i2 . i2) (o, exprs)
 \end{code}
-\emph{Ana + cata + hylo}:
+
+Para a definição de |recExpr|, recorreu-se ao functor base |baseExpr| assim como
+tomou-se inspiração na definição de |recExp|, definida na biblioteca \Exp.
+Deste modo, obteu-se que:
+
+\begin{eqnarray*}
+\start
+|recExpr f = baseExpr id id f = id + (id + id >< map f)|
+\end{eqnarray*}
+
 \begin{code}
-cataExpr g = undefined
-
-anaExpr g = undefined
-
-hyloExpr h g = undefined
+recExpr f = id -|- (id -|- id >< map f)
 \end{code}
+
+\noindent
+\textit{Ana + cata + hylo}:
+
+Através do isomorfismo entre |inExpr| e |outExpr|, as respetivas leis de isomorfismos,
+´Shunt-left' (33) e ´Shunt-right' (34), assim como da lei de indução,
+Universal-cata (46), da lei de coindução, Universal-ana (55),
+e da definição de hilomorfismos, obteve-se as seguintes definições:
+
+\begin{code}
+cataExpr g   = g . recExpr (cataExpr g) . outExpr
+
+anaExpr  g   = inExpr . recExpr (anaExpr g) . g
+
+hyloExpr h g = cataExpr h . anaExpr g
+\end{code}
+
+\clearpage
+
+\noindent
 \emph{Maps}:
+
+TODO texto fmap (T f = ...)?
+
+TODO texto bmap
+
+\begin{code}
+instance Functor (Expr b) where
+    fmap g = cataExpr (inExpr . baseExpr g id id)
+
+-- TODO Dúvida bmap está certo?
+instance BiFunctor Expr where
+    bmap h g = cataExpr (inExpr . baseExpr g h id)
+\end{code}
+
+\noindent
 \emph{Monad}:
+
+\begin{code}
+-- TODO verificar de acordo com os exercícios da ficha 12
+
+instance Monad (Expr b) where
+    return  = V
+    t >>= g = (muExpr . fmap g) t
+
+muExpr :: Expr b (Expr b a) -> Expr b a
+muExpr = cataExpr (either id (either N (uncurry T)))
+
+instance Applicative (Expr b) where
+    pure  = return
+    (<*>) = aap
+\end{code}
+
+\noindent
 \emph{Let expressions}:
+
+TODO falar da versão pointwise
+
+TODO falar da versão pointfree que é equivalente:
+
 \begin{code}
-let_exp = undefined
+let_exp f = cataExpr (either f (either N (uncurry T)))
+
+let_exp' = muExpr .: fmap  -- equivalent: (muExpr .) . fmap
+  where (.:) = (.) . (.)
 \end{code}
+
+\noindent
 Catamorfismo monádico:
+
 \begin{code}
-mcataExpr g = undefined
+mcataExpr phi t = do { b <- traverseExpr (mcataExpr phi) (outExpr t); phi b }
+
+traverseExpr f = either (return . i1) (either (return . i2 . i1) m)
+  where m (op,es) = do { cs <- mapM f es; return $ i2 $ i2 (op, return cs) }
 \end{code}
+
+\noindent
 Avaliação de expressões:
+
 \begin{code}
-evaluate = undefined
+evaluate = mcataExpr singleEval
+  where
+    singleEval :: (Num a, Ord a) => Either b (Either a (Op, Maybe [a])) -> Maybe a
+    singleEval (Left _) = Nothing
+    singleEval (Right (Left n)) = Just n
+    singleEval (Right (Right (Add, Just [x, y]))) = Just (x + y)
+    singleEval (Right (Right (Mul, Just [x, y]))) = Just (x * y)
+    singleEval (Right (Right (Suc, Just [x]))) = Just (x + 1)
+    singleEval (Right (Right (ITE, Just [x, y, z]))) =
+        if x /= 0 then Just y else Just z
+    singleEval _ = Nothing
 \end{code}
 
 %----------------- Índice remissivo (exige makeindex) -------------------------%

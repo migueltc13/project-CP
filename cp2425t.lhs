@@ -696,9 +696,48 @@ mergeSubtrees (tree:trees) = tree : mergeSubtrees trees
 
 \subsection*{Problema 3}
 
+\subsection*{Solução Elaborada}
 \begin{code}
 convolve :: Num a => [a] -> [a] -> [a]
-convolve = undefined
+convolve = cataList conquer .: curry divide
+    where
+      (.:) :: (c -> d) -> (a -> b -> c) -> a -> b -> d
+      (.:) = (.) . (.)
+
+      divide = uncurry zipper . cond (uncurry (>) . (length >< length)) swap id
+
+      zipper n m = zip (replicate l n) (map (h m) [1..l])
+        where
+          l = length n + length m - 1
+
+      h xs i = (++) r . reverse . take (i - l) $ drop l xs
+        where
+          l = max 0 (i - length xs)
+          r = replicate l 0
+      
+      conquer = either g1 g2
+      
+      g1 = nil      
+      g2 = cons . (f >< id)
+      f = sum . uncurry (zipWith (*))
+\end{code}
+
+\subsection*{Alternativa}
+\begin{code}
+convolve' = curry (uncurry drop . split diffTamanho (hyloList conquer divide . inFormat . checkGreater))
+     where
+          diffTamanho = abs . uncurry (-) . (length >< length)
+          checkGreater = cond (uncurry (>) . (length >< length)) id swap
+          inFormat = split id (swap . split (flip (-) 1 . (2*) . length . p1) p2)
+          
+          conquer = either nil (cons . (applyMaths >< id))
+               where applyMaths = sum . uncurry (zipWith (*)) . swap . p1
+
+          
+          divide = cond ((0 ==) . p2 . p2) (i1 . (!)) (i2 . dup . split (split (p1 . p1) listaTorna) ((id >< flip (-) 1) . p2))
+               where
+                    listaTorna = buildPair . split p2 (length . p1 . p1)
+                    buildPair = uncurry drop . split (p2 . p1) (uncurry (++) . split (flip replicate 0 . p2) (reverse . p1 . p1)) 
 \end{code}
 
 \clearpage

@@ -1,7 +1,7 @@
 # Program Design by Calculation Project
 
 This repository contains a collection of exercises implemented in Haskell
-within the *Program Design by Calculation environment in the 2024/2025 academic year.
+within the *Program Design by Calculation* environment in the 2024/2025 academic year.
 
 This project follows a **literate programming** approach, where the source code and
 documentation are intertwined in a single file.
